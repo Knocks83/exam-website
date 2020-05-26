@@ -1,0 +1,176 @@
+-- phpMyAdmin SQL Dump
+-- version 4.8.5
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: May 25, 2020 at 06:25 PM
+-- Server version: 10.1.38-MariaDB
+-- PHP Version: 7.3.3
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `esame`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `air_cities`
+--
+
+CREATE TABLE `air_cities` (
+  `city` varchar(30) NOT NULL,
+  `province` varchar(30) NOT NULL,
+  `latitude` double NOT NULL,
+  `longitude` double NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `air_measurements`
+--
+
+CREATE TABLE `air_measurements` (
+  `Measurement_ID` int(10) UNSIGNED NOT NULL,
+  `sensor_ID` int(10) UNSIGNED NOT NULL,
+  `Date` datetime NOT NULL,
+  `Value` int(10) NOT NULL,
+  `Status` varchar(2) COLLATE utf8_bin NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `air_sensors`
+--
+
+CREATE TABLE `air_sensors` (
+  `ID` int(10) UNSIGNED NOT NULL,
+  `type` varchar(30) NOT NULL,
+  `station_ID` int(10) UNSIGNED NOT NULL,
+  `data_start` date DEFAULT NULL,
+  `data_end` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `air_sensortypes`
+--
+
+CREATE TABLE `air_sensortypes` (
+  `type_name` varchar(30) NOT NULL,
+  `unit_of_measure` varchar(5) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `air_stations`
+--
+
+CREATE TABLE `air_stations` (
+  `ID` int(10) UNSIGNED NOT NULL,
+  `name` varchar(40) NOT NULL,
+  `city` varchar(30) NOT NULL,
+  `height` int(10) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `air_cities`
+--
+ALTER TABLE `air_cities`
+  ADD PRIMARY KEY (`city`);
+
+--
+-- Indexes for table `air_measurements`
+--
+ALTER TABLE `air_measurements`
+  ADD PRIMARY KEY (`Measurement_ID`),
+  ADD KEY `sensor_ID` (`sensor_ID`);
+
+--
+-- Indexes for table `air_sensors`
+--
+ALTER TABLE `air_sensors`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `type` (`type`),
+  ADD KEY `station_ID` (`station_ID`);
+
+--
+-- Indexes for table `air_sensortypes`
+--
+ALTER TABLE `air_sensortypes`
+  ADD PRIMARY KEY (`type_name`);
+
+--
+-- Indexes for table `air_stations`
+--
+ALTER TABLE `air_stations`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `city` (`city`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `air_measurements`
+--
+ALTER TABLE `air_measurements`
+  MODIFY `Measurement_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `air_sensors`
+--
+ALTER TABLE `air_sensors`
+  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `air_stations`
+--
+ALTER TABLE `air_stations`
+  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `air_measurements`
+--
+ALTER TABLE `air_measurements`
+  ADD CONSTRAINT `air_measurements_ibfk_1` FOREIGN KEY (`sensor_ID`) REFERENCES `air_sensors` (`ID`);
+
+--
+-- Constraints for table `air_sensors`
+--
+ALTER TABLE `air_sensors`
+  ADD CONSTRAINT `air_sensors_ibfk_1` FOREIGN KEY (`type`) REFERENCES `air_sensortypes` (`type_name`),
+  ADD CONSTRAINT `air_sensors_ibfk_2` FOREIGN KEY (`station_ID`) REFERENCES `air_stations` (`ID`);
+
+--
+-- Constraints for table `air_stations`
+--
+ALTER TABLE `air_stations`
+  ADD CONSTRAINT `air_stations_ibfk_1` FOREIGN KEY (`city`) REFERENCES `air_cities` (`city`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

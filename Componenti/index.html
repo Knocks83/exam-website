@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <title>Cosa ho usato? - Luca Fenu</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../css/css.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="d-flex flex-grow-1">
+            <span class="w-100 d-lg-none d-block">
+                <!-- spacer nascosto per centrare il nome su mobile --></span>
+            <a class="navbar-brand" href="#">
+                Luca Fenu
+            </a>
+            <!-- Bottone per navbar su mobile -->
+            <div class="w-100 text-right">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </div>
+        <div class="collapse navbar-collapse flex-grow-1 text-right" id="myNavbar">
+            <ul class="navbar-nav ml-auto flex-nowrap">
+                <!-- Link -->
+                <li class="nav-item">
+                    <a class="nav-link" href="../">Home</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownAir" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Sensori Aria
+                    </a>
+                    <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownAir">
+                        <a class="dropdown-item" href="../Sensori_aria/Stazioni">Stazioni</a>
+                        <a class="dropdown-item" href="../Sensori_aria/Dati">Dati</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../Milano">Dati aree pedonali e ZTL</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Cosa ho usato?</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container text-center">
+        <h2>What We're using</h2>
+        <div class="row">
+            <div class="col-sm-4">
+                <img class="icon" src="../img/html5.png">
+                <h4>HTML5</h4>
+            </div>
+            <div class="col-sm-4">
+                <img class="icon" src="../img/bootstrap.png">
+                <h4>Bootstrap</h4>
+            </div>
+            <div class="col-sm-4">
+                <img class="icon" src="../img/css3.png">
+                <h4>CSS3</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Here's the cool thing about Bootstrap...</h4>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ante dolor, luctus quis nisi at,
+                    convallis ultricies ligula. Proin semper tempor libero a interdum. Cras rhoncus, ligula sit amet
+                    tincidunt pellentesque, sapien odio tempor nunc, quis malesuada turpis nulla nec leo. Morbi vel
+                    felis ex. Sed tincidunt mi sapien, et porttitor orci pretium et. Sed felis est, feugiat id neque
+                    vel, dignissim semper augue. Donec molestie sem nec libero fermentum porta. Maecenas rutrum mollis
+                    mi, vel interdum justo sodales non.</p>
+                <p>Vivamus ac erat aliquam, scelerisque dolor vel, pellentesque leo. Curabitur ultrices quam nec turpis
+                    sodales condimentum a in libero. Nulla facilisis vestibulum est, in gravida tellus tristique et.
+                    Vestibulum eu magna nec mi vestibulum elementum. Aliquam est ligula, aliquet sed vestibulum in,
+                    dapibus ac nulla. Pellentesque sollicitudin consequat odio vitae gravida. Suspendisse congue nibh
+                    blandit aliquam congue.</p>
+            </div>
+            <div class="col-md-6">
+                <img src="../img/bootstrap2.jpg" class="img-responsive">
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <h4>Built with Sass</h4>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ante dolor, luctus quis nisi at,
+                    convallis ultricies ligula. Proin semper tempor libero a interdum. Cras rhoncus, ligula sit amet
+                    tincidunt pellentesque, sapien odio tempor nunc, quis malesuada turpis nulla nec leo.</p>
+
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <img src="../img/sass.png" class="img-responsive">
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <h4>And Less.</h4>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ante dolor, luctus quis nisi at,
+                    convallis ultricies ligula. Proin semper tempor libero a interdum. Cras rhoncus, ligula sit amet
+                    tincidunt pellentesque, sapien odio tempor nunc, quis malesuada turpis nulla nec leo.</p>
+
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <img src="../img/less.png" class="img-responsive">
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row col-lg-3">
+            <h4><a href="#hidden" data-toggle="collapse">Learn more about Bootstrap</a></h4>
+            <div id="hidden" class="collapse">
+                <h4>Here's the cool thing about Bootstrap...</h4>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ante dolor, luctus quis nisi at,
+                    convallis ultricies ligula. Proin semper tempor libero a interdum. Cras rhoncus, ligula sit amet
+                    tincidunt pellentesque, sapien odio tempor nunc, quis malesuada turpis nulla nec leo. Morbi vel
+                    felis ex. Sed tincidunt mi sapien, et porttitor orci pretium et. Sed felis est, feugiat id neque
+                    vel, dignissim semper augue. Donec molestie sem nec libero fermentum porta. Maecenas rutrum mollis
+                    mi, vel interdum justo sodales non.</p>
+                <p>Vivamus ac erat aliquam, scelerisque dolor vel, pellentesque leo. Curabitur ultrices quam nec turpis
+                    sodales condimentum a in libero. Nulla facilisis vestibulum est, in gravida tellus tristique et.
+                    Vestibulum eu magna nec mi vestibulum elementum. Aliquam est ligula, aliquet sed vestibulum in,
+                    dapibus ac nulla. Pellentesque sollicitudin consequat odio vitae gravida. Suspendisse congue nibh
+                    blandit aliquam congue.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="page-footer font-small bg-dark">
+        <div class="footer-copyright text-center py-3">
+            <a href="https://github.com/Knocks83">Creato da Luca Fenu per la prova di maturità 2019/2020</a>
+        </div>
+
+    </footer>
+
+</body>
+
+</html>

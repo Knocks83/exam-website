@@ -1,0 +1,56 @@
+body {
+    position: relative;
+/*    background-color: gray;*/
+    min-height: 100vh;
+    margin: 0;
+    padding-bottom: 10px;
+}
+
+.dropdown-menu.bg-dark a {
+    color: #FFF;
+}
+
+.dropdown-menu.bg-dark a:hover {
+    background-color: #FFF;
+    color: black;
+}
+
+.container {
+    margin: 4% auto;
+}
+
+.icon {
+    max-width: 200px;
+    margin: 1% auto;
+}
+
+footer a,
+footer a:hover {
+    color: #FFF;
+}
+
+
+footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 10px;
+}
+
+@media (max-width: 900px) {
+    .navbar-text {
+        padding-left: 15px;
+    }
+
+    .page-footer a {
+        font-size: small;
+    }
+
+    #icon {
+        max-width: 150px;
+    }
+
+    h2 {
+        font-size: 1.7em;
+    }
+}

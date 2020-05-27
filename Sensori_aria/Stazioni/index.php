@@ -5,10 +5,17 @@
     <title>Stazioni - Luca Fenu</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap + deps -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.21/b-1.6.2/b-colvis-1.6.2/cr-1.5.2/r-2.2.5/sc-2.0.2/datatables.min.css" />
+
+    <!-- Datatables -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/jq-3.3.1/dt-1.10.21/b-1.6.2/b-colvis-1.6.2/cr-1.5.2/r-2.2.5/sc-2.0.2/datatables.min.css" />
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jq-3.3.1/dt-1.10.21/b-1.6.2/b-colvis-1.6.2/cr-1.5.2/r-2.2.5/sc-2.0.2/datatables.min.js"></script>
+
     <link rel="stylesheet" href="../../css/css.css">
 </head>
 
@@ -53,66 +60,56 @@
     </nav>
 
     <div class="container mt-3 table-responsive">
-        <input class="form-control" id="cerca" type="text" placeholder="Cerca...">
-        <table class="table table-bordered table-hover">
+        
+        <table id="table_id" class="table table-bordered table-hover">
             <thead>
                 <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">First</th>
-                    <th scope="col">Last</th>
-                    <th scope="col">Handle</th>
-                </tr>
-            </thead>
-            <tbody id="tbody">
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                </tr>
-                <tr>
-                    <th scope="row">3</th>
-                    <td colspan="1">Larry the Bird</td>
-                    <td>test</td>
-                    <td>@twitter</td>
-                </tr>
-            </tbody>
+                    <?php
+                    include '../../config.php';
+                    include '../../functions.php';
+
+                    try {
+                        $conn = new PDO("mysql:host=$db_host;dbname=$db_name", $db_user, $db_password);
+                        // set the PDO error mode to exception
+                        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                        $cols = $conn->query('SELECT `COLUMN_NAME`
+                            FROM `INFORMATION_SCHEMA`.`COLUMNS`
+                            WHERE `TABLE_SCHEMA`="esame" AND `TABLE_NAME`="air_stations"')->fetchAll();
+                        foreach ($cols as $col) {
+                            print('<th>' . $col['COLUMN_NAME'] . '</th>');
+                        }
+                        print('</tr>
+                        </thead>
+                        <tbody id="tbody">');
+                        $vals = $conn->query('SELECT * FROM air_stations')->fetchAll();
+
+                        foreach ($vals as $val) {
+                            print('<tr>');
+                            print('<th scope="row">' . $val['ID'] . '</th>');
+                            print('<td>' . $val['name'] . '</td>');
+                            print('<td>' . $val['city'] . '</td>');
+                            print('<td>' . $val['height'] . '</td>');
+                            print('</tr>');
+                        }
+                        /*
+                        if (!isset($_GET['whatever'])) {
+                        }*/
+                    } catch (PDOException $e) {
+                        echo "Error: " . $e->getMessage();
+                    }
+                    ?>
+                    </tbody>
         </table>
     </div>
-    <!--
-    <?php
-    include '../../config.php';
-    include '../../functions.php';
-
-    try {
-        $conn = new PDO("mysql:host=$db_host;dbname=$db_name", $db_user, $db_password);
-        // set the PDO error mode to exception
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        if (!isset($_POST['whatever'])) {
-        }
-    } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage();
-    }
-    ?>-->
 
     <script>
         $(document).ready(function() {
-            $("#cerca").on("keyup", function() {
-                var value = $(this).val().toLowerCase();
-                $("#tbody tr").filter(function() {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-                });
+            $('#table_id').DataTable({
+                colReorder: true
             });
         });
     </script>
-
     <!-- Footer -->
     <footer class="page-footer font-small bg-dark">
         <div class="footer-copyright text-center py-3">

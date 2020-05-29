@@ -28,15 +28,11 @@
             bottom: 50px;
         }
 
-        .carousel {
-            margin-bottom: 60px;
-        }
-
         .carousel-item img {
-            height: calc(100vh - 132px);
+            height: calc(95vh - 56px);
             width: 100vw;
             margin: auto;
-            object-fit:cover;
+            object-fit: cover;
         }
 
         .btn {
@@ -91,21 +87,11 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="#">Home</a>
                 </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownAir" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Sensori Aria
-                    </a>
-                    <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownAir">
-                        <a class="dropdown-item" href="./Sensori_aria/Stazioni">Stazioni</a>
-                        <a class="dropdown-item" href="./Sensori_aria/Dati">Dati</a>
-                    </div>
+                <li class="nav-item">
+                    <a class="nav-link" href="./Air_sensors">Air Sensors</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="./Milano">Dati aree pedonali e ZTL</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="./Componenti">Cosa ho usato?</a>
+                    <a class="nav-link" href="./Componenti">What did I use?</a>
                 </li>
             </ul>
         </div>
@@ -146,34 +132,13 @@
         </a>
     </div>
 
-    <div id="index" style="display: none;">
-        <ul class="list-group">
-            <li class="list-group-item">
-                <!-- Air open button -->
-            <li class="list-group-item" data-toggle="collapse" data-target="#Air">Air</li>
-            <!-- Air sub list -->
-            <ul id="Air" class="list-group collapse" style="padding-left: 20px;">
-                <li class="list-group-item">Data</li>
-                <li class="list-group-item">Sensors</li>
-            </ul>
-            </li>
-            <!-- ZTL open button -->
-            <li class="list-group-item" data-toggle="collapse" data-target="#ZTL">ZTL</li>
-            <!-- ZTL sub list -->
-            <ul id="ZTL" class="list-group collapse" style="padding-left: 20px;">
-                <li class="list-group-item">unkn1</li>
-                <li class="list-group-item">unkn2</li>
-            </ul>
-        </ul>
-    </div>
-
     <!-- Footer -->
     <footer class="page-footer font-small bg-dark">
-        <div class="footer-copyright text-center py-3">
+        <div class="container-fluid text-center">
             <a href="https://github.com/Knocks83">Creato da Luca Fenu per la prova di maturità 2019/2020</a>
         </div>
-
     </footer>
 
 </body>
+
 </html>

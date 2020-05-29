@@ -41,10 +41,8 @@ function updateAirDB(PDO $PDO)
         Storico VARCHAR(30),
         DataStart VARCHAR(30),
         DataStop VARCHAR(30),
-        Utm_Nord VARCHAR(30),
-        UTM_Est VARCHAR(30),
-        lat INT,
-        lng INT
+        lat DOUBLE,
+        lng DOUBLE
     );");
 
     $createTableStmt->execute();
@@ -52,8 +50,8 @@ function updateAirDB(PDO $PDO)
 
     // Long, shouldn't be like that but it's just a list.
     // Using positional values to not increase the length of the execute statement
-    $addStmt = $PDO->prepare("INSERT INTO $tempTableName(IdSensore, NomeTipoSensore,UnitaMisura,IdStazione,NomeStazione,Quota,Provincia,Comune,Storico,DataStart,DataStop,Utm_Nord,UTM_Est,lat,lng)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $addStmt = $PDO->prepare("INSERT INTO $tempTableName(IdSensore, NomeTipoSensore,UnitaMisura,IdStazione,NomeStazione,Quota,Provincia,Comune,Storico,DataStart,DataStop,lat,lng)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
     foreach ($stations as $station) {
         if (!isset($station->datastart)) {
@@ -66,7 +64,7 @@ function updateAirDB(PDO $PDO)
 
         $addStmt->execute([
             $station->idsensore, $station->nometiposensore, $station->unitamisura, $station->idstazione, $station->nomestazione, $station->quota, $station->provincia,
-            $station->comune, $station->storico, $station->datastart, $station->datastop, $station->utm_nord, $station->utm_est, $station->lat, $station->lng
+            $station->comune, $station->storico, $station->datastart, $station->datastop, $station->lat, $station->lng
         ]);
     }
     unset($addStmt, $stations);

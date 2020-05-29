@@ -7,12 +7,12 @@ body {
 }
 
 .dropdown-menu.bg-dark a {
-    color: #FFF;
+    color: #9a9da0;
 }
 
 .dropdown-menu.bg-dark a:hover {
-    background-color: #FFF;
-    color: black;
+    background-color: #9a9da0;
+    color: white;
 }
 
 .container {
@@ -29,12 +29,12 @@ footer a:hover {
     color: #FFF;
 }
 
-
 footer {
     position: absolute;
     bottom: 0;
     width: 100%;
     padding: 10px;
+    height: 5vh;
 }
 
 @media (max-width: 900px) {

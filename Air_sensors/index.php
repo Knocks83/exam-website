@@ -2,18 +2,39 @@
 <html lang="it">
 
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Get the $_GET['table'], check if it's in the tables and set the title -->
     <?php
     include '../config.php';
 
-    $getTable = $default_table;
-    if (isset($_GET['table'])) {
-        $getTable = $_GET['table'];
+    $tables = [];
+    try {
+        $conn = new PDO("mysql:host=$db_host;dbname=$db_name", $db_user, $db_password);
+        // set the PDO error mode to exception
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $tablesTmp = $conn->query('SHOW TABLES;')->fetchAll(PDO::FETCH_NUM);
+
+        foreach ($tablesTmp as $table) {
+            $tables[] = $table[0];
+        }
+        unset($tablesTmp);
+
+        // Check if the get table actually exists, otherwise use the default one
+        $getTable = '';
+        if (isset($_GET['table']) && in_array($_GET['table'], $tables)) {
+            $getTable = $_GET['table'];
+        } else {
+            $getTable = $default_table;
+        }
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
     }
+
     print("<title>$getTable - Luca Fenu</title>");
     ?>
-    <title>Stazioni - Luca Fenu</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Set favicons -->
     <link rel="icon" type="image/png" sizes="16x16" href="../img/favicon-16x16.png">
@@ -34,10 +55,6 @@
     <link rel="stylesheet" href="../css/css.css">
 
     <style>
-        body {
-            background-color: #2a2a2e;
-        }
-
         label {
             color: white;
         }
@@ -89,9 +106,30 @@
             z-index: 1050;
         }
 
+        #table-select {
+            background-color: #3e444a;
+        }
+
+        #table-select a {
+            color: white;
+        }
+
+        #table-select a:hover {
+            background-color: #2a2a2e;
+        }
+
+        #table-select-button {
+            background-color: #343a40;
+        }
+
         .form-control {
             background-color: #343a40;
             border: 0px;
+        }
+
+        #delButtons::before,
+        #delButtons::after {
+            display: none !important;
         }
     </style>
 </head>
@@ -150,37 +188,39 @@
         </div>
     </div>
 
-    <!-- The container that contains the table + the controls. Display:none because once the page has finished loading it gets changed -->
+    <!-- Modal to add/edit DB data -->
+    <div class="modal fade" id="dataModal" tabindex="-1" role="dialog" aria-labelledby="modalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="dataModalTitle">Edit/Add data</h5>
+                    <button type="button" class="close" data-dismiss="dataModal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body mx-auto">
+                    <h1>Text!</h1>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- The container that contains the table + the controls. Display:none to avoid a FOUC -->
     <div id="table_container" class="container mt-3 table-responsive" style="display: none;">
-        <div class="row">
+        <div class="row" style="padding: 5px 0px;">
             <div class="col">
                 <!-- Choose table dropdown. Every item in the dropdown is a href to the page with ?table=tablename. -->
                 <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="table-select-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Choose table
                     </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <div class="dropdown-menu" id="table-select" aria-labelledby="dropdownMenuButton">
                         <?php
-                        include '../config.php';
-
-                        $tables = [];
-                        try {
-                            $conn = new PDO("mysql:host=$db_host;dbname=$db_name", $db_user, $db_password);
-                            // set the PDO error mode to exception
-                            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-                            $tablesTmp = $conn->query('SHOW TABLES;')->fetchAll(PDO::FETCH_NUM);
-
-                            foreach ($tablesTmp as $table) {
-                                $tables[] = $table[0];
-                            }
-                            unset($tablesTmp);
-
-                            foreach ($tables as $table) {
-                                print('<a class="dropdown-item" href=".?table=' . $table . '">' . $table . '</a>');
-                            }
-                        } catch (PDOException $e) {
-                            echo "Error: " . $e->getMessage();
+                        foreach ($tables as $table) {
+                            print('<a class="dropdown-item" href=".?table=' . $table . '">' . $table . '</a>');
                         }
                         ?>
                     </div>
@@ -200,22 +240,23 @@
                         // set the PDO error mode to exception
                         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                        // Check if the table actually exists, otherwise go back to the default one
-                        if (!in_array($getTable, $tables)) {
-                            $getTable = $default_table;
-                        }
-
                         // Getting the columns of the table
                         $cols = $conn->query('SELECT `COLUMN_NAME`
                             FROM `INFORMATION_SCHEMA`.`COLUMNS`
                             WHERE `TABLE_SCHEMA`="' . $db_name . '" AND `TABLE_NAME`="' . $getTable . '"')->fetchAll();
+
+                        // Add the column that contains the red '-' buttons
+                        print('<th id="delButtons"><button type="button" class="btn btn-success" data-toggle="modal" data-target="#dataModal">+</button></th>');
+                        // Now add the table columns
                         foreach ($cols as $col) {
                             print('<th>' . $col['COLUMN_NAME'] . '</th>');
                         }
+
                         // If the table is air_stations, add an empty column that will contain the map buttons
                         if ($getTable == 'air_stations') {
                             print('<th></th>');
                         }
+                        // Close table head and open table body
                         print('</tr>
                         </thead>
                         <tbody id="tbody">');
@@ -226,9 +267,17 @@
                             print('<tr>');
                             foreach ($row as $index => $value) {
                                 if ($index == 0) {
-                                    print('<th scope="row">' . $value . '</th>');
+                                    // When adding the first line, you also have to add the - button
+                                    print('<th scope="row">
+                                        <form method="POST" action=".">
+                                            <input type="text" style="display: none;" name="action" value="DEL"></input>
+                                            <input type="text" style="display: none;" name="ID" value="' . utf8_encode($value) . '"></input>
+                                            <input type="submit" class="btn btn-danger" value="-"></input>
+                                        </form>
+                                    </th>');
+                                    print('<td>' . utf8_encode($value) . '</td>');
                                 } else {
-                                    print('<td>' . $value . '</td>');
+                                    print('<td>' . utf8_encode($value) . '</td>');
                                 }
                             }
                             // If the table is air_stations, add the buttons
@@ -237,7 +286,8 @@
                                 $coords = $conn->query("SELECT air_cities.latitude, air_cities.longitude
                                 FROM air_cities
                                 WHERE air_cities.city = \"$city\"")->fetchAll(PDO::FETCH_ASSOC);
-                                print('<td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal" data-lat="' . $coords[0]['latitude'] . '" data-lng="' . $coords[0]['longitude'] . '">Open map</button></td>');
+                                // Add the map button
+                                print('<td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal" data-lat="' . $coords[0]['latitude'] . '" data-lng="' . $coords[0]['longitude'] . '">Map</button></td>');
                             }
                             print('</tr>');
                         }
@@ -254,7 +304,6 @@
         function loadMapScenario() {
             var lat = document.getElementById('latCoord').text
             var lng = document.getElementById('lngCoord').text
-            console.log(lat)
 
             var map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
                 center: new Microsoft.Maps.Location(lat, lng)
@@ -270,7 +319,13 @@
         // When the document is ready, load DataTables and then show the table
         $(document).ready(function() {
             $('#table').DataTable({
-                colReorder: true,
+                "columnDefs": [{
+                    "orderable": false,
+                    "targets": [0]
+                }],
+                colReorder: {
+                    fixedColumnsLeft: 1
+                }
             });
             document.getElementById('table_container').style.display = 'block';
         });
@@ -283,6 +338,10 @@
             var modal = $(this)
             modal.find('.modal-title').text("Latitude: " + lat + ' - Longitude: ' + lng) // Set the modal title
             loadMapScenario() // Load the map
+        })
+        $('#dataModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget) // Button that triggered the modal
+
         })
     </script>
 

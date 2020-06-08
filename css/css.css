@@ -7,11 +7,11 @@ body {
 }
 
 .dropdown-menu a {
-    color: #9a9da0;
+    color: #343a40;
 }
 
 .dropdown-menu a:hover {
-    background-color: #9a9da0;
+    background-color: #343a40;
     color: white;
 }
 

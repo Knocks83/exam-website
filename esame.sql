@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 25, 2020 at 06:25 PM
+-- Generation Time: Jun 08, 2020 at 10:21 AM
 -- Server version: 10.1.38-MariaDB
 -- PHP Version: 7.3.3
 
@@ -29,11 +29,11 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `air_cities` (
-  `city` varchar(30) NOT NULL,
-  `province` varchar(30) NOT NULL,
+  `city` varchar(30) CHARACTER SET latin1 NOT NULL,
+  `province` varchar(30) CHARACTER SET latin1 NOT NULL,
   `latitude` double NOT NULL,
   `longitude` double NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -46,8 +46,8 @@ CREATE TABLE `air_measurements` (
   `sensor_ID` int(10) UNSIGNED NOT NULL,
   `Date` datetime NOT NULL,
   `Value` int(10) NOT NULL,
-  `Status` varchar(2) COLLATE utf8_bin NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+  `Status` varchar(2) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -57,11 +57,11 @@ CREATE TABLE `air_measurements` (
 
 CREATE TABLE `air_sensors` (
   `ID` int(10) UNSIGNED NOT NULL,
-  `type` varchar(30) NOT NULL,
+  `type` varchar(30) CHARACTER SET latin1 NOT NULL,
   `station_ID` int(10) UNSIGNED NOT NULL,
   `data_start` date DEFAULT NULL,
   `data_end` date DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -70,9 +70,9 @@ CREATE TABLE `air_sensors` (
 --
 
 CREATE TABLE `air_sensortypes` (
-  `type_name` varchar(30) NOT NULL,
-  `unit_of_measure` varchar(5) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `type_name` varchar(30) CHARACTER SET latin1 NOT NULL,
+  `unit_of_measure` varchar(5) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -82,10 +82,10 @@ CREATE TABLE `air_sensortypes` (
 
 CREATE TABLE `air_stations` (
   `ID` int(10) UNSIGNED NOT NULL,
-  `name` varchar(40) NOT NULL,
-  `city` varchar(30) NOT NULL,
+  `name` varchar(40) CHARACTER SET latin1 NOT NULL,
+  `city` varchar(30) CHARACTER SET latin1 NOT NULL,
   `height` int(10) UNSIGNED NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Indexes for dumped tables

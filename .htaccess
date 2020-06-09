@@ -1,0 +1,14 @@
+<Files "database.php">  
+  Order Allow,Deny
+  Deny from all
+</Files>
+
+<Files "api.php">  
+  Order Allow,Deny
+  Deny from all
+</Files>
+
+<Files "config.php">  
+  Order Allow,Deny
+  Deny from all
+</Files>

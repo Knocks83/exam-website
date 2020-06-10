@@ -87,7 +87,16 @@ class Api
     function search($field, $input)
     {
         // Prepare the query
-        $stmt = $this->conn->prepare('SELECT * FROM ' . $this->table_name . " WHERE $field  = \"" . $input . '";');
+        $stmt = $this->conn->query('SELECT * FROM ' . $this->table_name . " WHERE $field  = \"" . $input . '";');
+
+        return $stmt;
+    }
+    function getCoords($city)
+    {
+        // Prepare the query
+        $stmt = $this->conn->query('SELECT latitude, longitude
+        FROM air_cities
+        WHERE air_cities.city = "' . $city . '"');
 
         return $stmt;
     }

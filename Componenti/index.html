@@ -2,7 +2,7 @@
 <html lang="it">
 
 <head>
-    <title>What did I use? - Luca Fenu</title>
+    <title>What did I use? - AllMyData</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -28,11 +28,10 @@
     <link rel="stylesheet" href="../css/css.css">
 
     <style>
-        h2 {
-            color: white;
-        }
-
-        h4 {
+        h1,
+        h2,
+        h4,
+        p {
             color: white;
         }
 
@@ -56,7 +55,7 @@
         }
 
         #card-content {
-            max-height: 30vh;
+            max-height: 75vh;
             overflow-y: auto
         }
     </style>
@@ -68,7 +67,7 @@
             <span class="w-100 d-lg-none d-block">
                 <!-- spacer nascosto per centrare il nome su mobile --></span>
             <a class="navbar-brand" href="#">
-                Luca Fenu
+                AllMyData
             </a>
             <!-- Bottone per navbar su mobile -->
             <div class="w-100 text-right">
@@ -93,109 +92,120 @@
         </div>
     </nav>
 
-    <div class="container text-center">
-        <h2>What We're using</h2>
-        <div class="row">
-            <div class="col-sm-4">
-                <img class="icon" src="../img/html5.png">
-                <h4>HTML5</h4>
-            </div>
-            <div class="col-sm-4">
-                <img class="icon" src="../img/bootstrap.png">
-                <h4>Bootstrap</h4>
-            </div>
-            <div class="col-sm-4">
-                <img class="icon" src="../img/css3.png">
-                <h4>CSS3</h4>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-4 mx-auto">
-                <img class="icon" src="../img/javascript.png">
-                <h4>Javascript</h4>
-            </div>
-            <div class="col-sm-4 mx-auto">
-                <img class="icon" src="../img/datatables.png">
-                <h4>Datatables</h4>
-            </div>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6 mx-auto">
-                <div class="card">
-                    <div class="card-header">
-                        <a href="https://github.com/Knocks83/exam-website">Github commits</a>
+    <div class="row" style="width: 100vw;">
+        <div class="col-md-7">
+            <div class="container text-center">
+                <h2>What I'm using</h2>
+                <div class="row justify-content-center align-items-center">
+                    <div class="col-sm-4">
+                        <img class="icon" src="../img/html5.png">
+                        <h4>HTML5</h4>
                     </div>
-                    <ul id="card-content" class="list-group list-group-flush" style="list-style-type: none;">
-                        <script>
-                            /** Convert a string into an array by splitting it to every '\n'
-                              * @params text input string
-                              * 
-                              * @return finalArray Array containing for each line the text of the line or <br> (that indicates a new line)
-                              */
-                            function generateTextArray(text) {
-                                var textArray = text.split('\n')
-                                var finalArray = []
-                                finalArray.push(textArray[0])
-                                var i = 1
-                                while (i < textArray.length) {
-                                    finalArray.push('<br>')
-                                    finalArray.push(textArray[i])
-                                    i++
-                                }
-
-                                return finalArray
-                            }
-                            $.getJSON('https://api.github.com/repos/Knocks83/exam-website/commits', function (data) {
-                                var card = document.getElementById('card-content')
-                                for (var commit of data) {
-                                    // Create the li element and create the text node containing the commit message
-                                    var element = document.createElement('li')
-                                    var commitMessage = commit.commit.message
-                                    var commitMessageArr = generateTextArray(commitMessage)         // Using GenerateTextArray so the commits
-                                    commitMessageArr.forEach(function (value) {                     // with multiple lines can be shown on 
-                                        if (value == '<br>') {                                      // multiple lines
-                                            element.appendChild(document.createElement('br'))
-                                        } else {
-                                            element.appendChild(document.createTextNode(value))
+                    <div class="col-sm-4">
+                        <img class="icon" src="../img/bootstrap.png">
+                        <h4>Bootstrap</h4>
+                    </div>
+                    <div class="col-sm-4">
+                        <img class="icon" src="../img/css3.png">
+                        <h4>CSS3</h4>
+                    </div>
+                    <div class="col-sm-4 mx-auto">
+                        <img class="icon" src="../img/javascript.png">
+                        <h4>Javascript</h4>
+                    </div>
+                    <div class="col-sm-4 mx-auto">
+                        <img class="icon" src="../img/php.png">
+                        <h4>PHP</h4>
+                    </div>
+                    <div class="col-sm-4 mx-auto">
+                        <img class="icon" src="../img/mysql.png">
+                        <h4>MySQL</h4>
+                    </div>
+                    <div class="col-sm-4 mx-auto">
+                        <img class="icon" src="../img/datatables.png">
+                        <h4>Datatables</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 mx-auto">
+                        <div class="card">
+                            <div class="card-header">
+                                <a href="https://github.com/Knocks83/exam-website">Github commits</a>
+                            </div>
+                            <ul id="card-content" class="list-group list-group-flush" style="list-style-type: none;">
+                                <script>
+                                    /** Convert a string into an array by splitting it to every '\n'
+                                      * @params text input string
+                                      * 
+                                      * @return finalArray Array containing for each line the text of the line or <br> (that indicates a new line)
+                                      */
+                                    function generateTextArray(text) {
+                                        var textArray = text.split('\n')
+                                        var finalArray = []
+                                        finalArray.push(textArray[0])
+                                        var i = 1
+                                        while (i < textArray.length) {
+                                            finalArray.push('<br>')
+                                            finalArray.push(textArray[i])
+                                            i++
                                         }
-                                    })
 
-                                    // Create the row div that'll contain the author and the commit code
-                                    var row = document.createElement('div')
-                                    row.classList.add('row', 'w-100')
-
-                                    // Create the column that'll contain the author name
-                                    var colAuthor = document.createElement('div')
-                                    colAuthor.classList.add('col', 'authorName')
-
-                                    var authorName = document.createTextNode(commit.committer.login)
-                                    colAuthor.appendChild(authorName)
-                                    row.appendChild(colAuthor)
-
-                                    // Create the column that'll contain the commit code and the verified status
-                                    var colCommit = document.createElement('div')
-                                    colCommit.classList.add('col', 'commitCode')
-                                    var commitCode = commit.sha
-                                    commitCode = document.createTextNode(commitCode.substring(0, 8))
-                                    colCommit.appendChild(commitCode)
-
-                                    if (commit.commit.verification.verified) {
-                                        colCommit.classList.add('verified')
-                                    } else {
-                                        colCommit.classList.add('unverified')
+                                        return finalArray
                                     }
-                                    row.appendChild(colCommit)
+                                    $.getJSON('https://api.github.com/repos/Knocks83/exam-website/commits', function (data) {
+                                        var card = document.getElementById('card-content')
+                                        for (var commit of data) {
+                                            // Create the li element and create the text node containing the commit message
+                                            var element = document.createElement('li')
+                                            var commitMessage = commit.commit.message
+                                            var commitMessageArr = generateTextArray(commitMessage)         // Using GenerateTextArray so the commits
+                                            commitMessageArr.forEach(function (value) {                     // with multiple lines can be shown on 
+                                                if (value == '<br>') {                                      // multiple lines
+                                                    element.appendChild(document.createElement('br'))
+                                                } else {
+                                                    element.appendChild(document.createTextNode(value))
+                                                }
+                                            })
 
-                                    element.appendChild(row)
-                                    element.classList.add('list-group-item')
-                                    card.appendChild(element)
-                                }
-                            });
-                        </script>
-                    </ul>
+                                            // Create the row div that'll contain the author and the commit code
+                                            var row = document.createElement('div')
+                                            row.classList.add('row', 'w-100')
+
+                                            // Create the column that'll contain the author name
+                                            var colAuthor = document.createElement('div')
+                                            colAuthor.classList.add('col', 'authorName')
+
+                                            var authorName = document.createTextNode(commit.committer.login)
+                                            colAuthor.appendChild(authorName)
+                                            row.appendChild(colAuthor)
+
+                                            // Create the column that'll contain the commit code and the verified status
+                                            var colCommit = document.createElement('div')
+                                            colCommit.classList.add('col', 'commitCode')
+                                            var commitCode = commit.sha
+                                            commitCode = document.createTextNode(commitCode.substring(0, 8))
+                                            colCommit.appendChild(commitCode)
+
+                                            if (commit.commit.verification.verified) {
+                                                colCommit.classList.add('verified')
+                                            } else {
+                                                colCommit.classList.add('unverified')
+                                            }
+                                            row.appendChild(colCommit)
+
+                                            element.appendChild(row)
+                                            element.classList.add('list-group-item')
+                                            card.appendChild(element)
+                                        }
+                                    });
+                                </script>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -204,7 +214,7 @@
     <!-- Footer -->
     <footer class="page-footer font-small bg-dark">
         <div class="container-fluid text-center">
-            <a href="https://github.com/Knocks83">Creato da Luca Fenu per la prova di maturità 2019/2020</a>
+            <a href="https://github.com/Knocks83">Website made by Luca Fenu for the graduation exam year 2019/2020</a>
         </div>
     </footer>
 

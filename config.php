@@ -5,6 +5,7 @@ $db_password = '';
 $db_name = 'esame';
 
 $default_table = 'air_stations';
+$base_dir = 'http://localhost/Esame';
 
 // Air
 $air_stationsUrl = 'http://www.dati.lombardia.it/resource/ib47-atvt.json';

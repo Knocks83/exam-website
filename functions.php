@@ -2,6 +2,21 @@
 
 include 'config.php';
 
+function fixJSON($json)
+{
+    $regex = <<<'REGEX'
+~
+    "[^"\\]*(?:\\.|[^"\\]*)*"
+    (*SKIP)(*F)
+  | '([^'\\]*(?:\\.|[^'\\]*)*)'
+~x
+REGEX;
+
+    return preg_replace_callback($regex, function ($matches) {
+        return '"' . preg_replace('~\\\\.(*SKIP)(*F)|"~', '\\"', $matches[1]) . '"';
+    }, $json);
+}
+
 function updateAirDB(PDO $PDO)
 {
     global $air_stationsUrl, $air_dataUrl;

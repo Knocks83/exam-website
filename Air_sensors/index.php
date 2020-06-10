@@ -9,31 +9,25 @@
     <?php
     include '../config.php';
 
-    $tables = [];
-    try {
-        $conn = new PDO("mysql:host=$db_host;dbname=$db_name", $db_user, $db_password);
-        // set the PDO error mode to exception
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $tablesApi = json_decode(file_get_contents($base_dir . '/api/schema.php'), true);
 
-        $tablesTmp = $conn->query('SHOW TABLES;')->fetchAll(PDO::FETCH_NUM);
-
-        foreach ($tablesTmp as $table) {
-            $tables[] = $table[0];
-        }
-        unset($tablesTmp);
-
-        // Check if the get table actually exists, otherwise use the default one
-        $getTable = '';
-        if (isset($_GET['table']) && in_array($_GET['table'], $tables)) {
-            $getTable = $_GET['table'];
-        } else {
-            $getTable = $default_table;
-        }
-    } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage();
+    if (isset($tablesApi['tables'])) {
+        $tables = $tablesApi['tables'];
+    } else {
+        $tables = [];
     }
 
-    print("<title>$getTable - Luca Fenu</title>");
+    // If it gets a table as parameter, check if it's in the DB tables
+    if (isset($_GET['table']) && in_array($_GET['table'], $tables)) {
+        // If the table is in the DB tables than use it
+        $getTable = $_GET['table'];
+    } else {
+        // If the table isn't in the DB tables, use the default table
+        $getTable = $default_table;
+    }
+
+    // Set the page title
+    print("<title>$getTable - AllMyData</title>");
     ?>
 
     <!-- Set favicons -->
@@ -43,18 +37,22 @@
 
     <!-- Bootstrap + deps -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.21/b-1.6.2/b-colvis-1.6.2/cr-1.5.2/r-2.2.5/sc-2.0.2/datatables.min.css" />
 
     <!-- Datatables -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.21/b-1.6.2/b-colvis-1.6.2/cr-1.5.2/fh-3.1.7/r-2.2.5/sc-2.0.2/sp-1.1.1/datatables.min.css" />
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.21/b-1.6.2/b-colvis-1.6.2/cr-1.5.2/fh-3.1.7/r-2.2.5/sc-2.0.2/sp-1.1.1/datatables.min.js"></script>
 
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/6871400b1b.js" crossorigin="anonymous"></script>
+
     <link rel="stylesheet" href="../css/css.css">
 
     <style>
+        /* DataTables styling */
         label {
             color: white;
         }
@@ -68,49 +66,19 @@
             border: 0px;
         }
 
-        .paginate_button {
-            border: 1px solid #343a40;
-        }
-
         .paginate_button.disabled a {
             background-color: #2a2a2e !important;
             border: 0px !important;
         }
 
+        .paginate_button,
         .paginate_button.disabled {
-            border: 1px solid #343a40 !important;
+            border: 1px solid #343a40;
         }
 
-        .modal-body {
-            position: relative;
-            overflow: hidden;
-            max-height: 400px;
-            padding: 15px;
-        }
-
-        body .modal-dialog {
-            max-width: 100%;
-            width: auto !important;
-            display: inline-block;
-        }
-
-        .modal {
-            z-index: -1;
-            display: flex !important;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-open .modal {
-            text-align: center;
-            z-index: 1050;
-        }
-
-        #table-select {
-            background-color: #3e444a;
-        }
-
-        #table-select a {
+        .custom-select,
+        .custom-select option {
+            background-color: #2a2a2e;
             color: white;
         }
 
@@ -127,9 +95,14 @@
             border: 0px;
         }
 
-        #delButtons::before,
-        #delButtons::after {
-            display: none !important;
+        /* End DataTables styling */
+
+        #table-select {
+            background-color: #3e444a;
+        }
+
+        #table-select a {
+            color: white;
         }
     </style>
 </head>
@@ -140,7 +113,7 @@
             <span class="w-100 d-lg-none d-block">
                 <!-- Hidden spacer to center the name on mobile --></span>
             <a class="navbar-brand" href="#">
-                Luca Fenu
+                AllMyData
             </a>
             <!-- Navbar button for mobile view -->
             <div class="w-100 text-right">
@@ -165,44 +138,46 @@
         </div>
     </nav>
 
+
     <!-- Modal to show the map when the table is air_stations -->
-    <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal fade" id="mapModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">Map</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <div style="display: none;"><a id="latCoord"></a><a id="lngCoord"></a></div>
+                    <h5 class="modal-title" id="mapModalTitle">Map</h5>
+                    <button type="button" class="close" data-dismiss="modal" data-target="#mapModal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
+                    <div style="display: none;"><a id="latCoord"></a><a id="lngCoord"></a></div>
                 </div>
                 <div class="modal-body mx-auto">
                     <!-- Map div + importing the Bing Maps JS (using the key "YourBingMapsKey" because it looks like it works) -->
-                    <div id='myMap' style='position: relative; width: 30vw; height: 30vh;'></div>
+                    <div id='myMap' style='position: relative; width: 50vh; height: 50vh;'></div>
                     <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?key=YourBingMapsKey' async defer></script>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" data-target="#mapModal">Close</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal to add/edit DB data -->
-    <div class="modal fade" id="dataModal" tabindex="-1" role="dialog" aria-labelledby="modalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+    <!-- Modal to edit the data -->
+    <div class="modal fade" id="dataModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="false">
+        <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="dataModalTitle">Edit/Add data</h5>
-                    <button type="button" class="close" data-dismiss="dataModal" aria-label="Close">
+                    <h5 class="modal-title" id="dataModalTitle">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" data-target="#dataModal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body mx-auto">
-                    <h1>Text!</h1>
+                <div class="modal-body">
+                    ...
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" data-target="#dataModal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
                 </div>
             </div>
         </div>
@@ -229,73 +204,6 @@
         </div>
         <!-- The actual table -->
         <table id="table" class="table table-bordered table-striped table-dark table-hover">
-            <thead>
-                <tr>
-                    <?php
-                    include '../config.php';
-                    include '../functions.php';
-
-                    try {
-                        $conn = new PDO("mysql:host=$db_host;dbname=$db_name", $db_user, $db_password);
-                        // set the PDO error mode to exception
-                        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-                        // Getting the columns of the table
-                        $cols = $conn->query('SELECT `COLUMN_NAME`
-                            FROM `INFORMATION_SCHEMA`.`COLUMNS`
-                            WHERE `TABLE_SCHEMA`="' . $db_name . '" AND `TABLE_NAME`="' . $getTable . '"')->fetchAll();
-
-                        // Add the column that contains the red '-' buttons
-                        print('<th id="delButtons"><button type="button" class="btn btn-success" data-toggle="modal" data-target="#dataModal">+</button></th>');
-                        // Now add the table columns
-                        foreach ($cols as $col) {
-                            print('<th>' . $col['COLUMN_NAME'] . '</th>');
-                        }
-
-                        // If the table is air_stations, add an empty column that will contain the map buttons
-                        if ($getTable == 'air_stations') {
-                            print('<th></th>');
-                        }
-                        // Close table head and open table body
-                        print('</tr>
-                        </thead>
-                        <tbody id="tbody">');
-                        $rows = $conn->query('SELECT * FROM ' . $getTable)->fetchAll(PDO::FETCH_NUM);
-
-                        // Fill the table
-                        foreach ($rows as $row) {
-                            print('<tr>');
-                            foreach ($row as $index => $value) {
-                                if ($index == 0) {
-                                    // When adding the first line, you also have to add the - button
-                                    print('<th scope="row">
-                                        <form method="POST" action=".">
-                                            <input type="text" style="display: none;" name="action" value="DEL"></input>
-                                            <input type="text" style="display: none;" name="ID" value="' . utf8_encode($value) . '"></input>
-                                            <input type="submit" class="btn btn-danger" value="-"></input>
-                                        </form>
-                                    </th>');
-                                    print('<td>' . utf8_encode($value) . '</td>');
-                                } else {
-                                    print('<td>' . utf8_encode($value) . '</td>');
-                                }
-                            }
-                            // If the table is air_stations, add the buttons
-                            if ($getTable == 'air_stations') {
-                                $city = $row[2];
-                                $coords = $conn->query("SELECT air_cities.latitude, air_cities.longitude
-                                FROM air_cities
-                                WHERE air_cities.city = \"$city\"")->fetchAll(PDO::FETCH_ASSOC);
-                                // Add the map button
-                                print('<td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal" data-lat="' . $coords[0]['latitude'] . '" data-lng="' . $coords[0]['longitude'] . '">Map</button></td>');
-                            }
-                            print('</tr>');
-                        }
-                    } catch (PDOException $e) {
-                        echo "Error: " . $e->getMessage();
-                    }
-                    ?>
-                    </tbody>
         </table>
     </div>
 
@@ -316,39 +224,168 @@
 
         }
 
+        function getTable(baseUrl, table, tableId) {
+            // Set xmlhttp
+            xmlhttp = new XMLHttpRequest();
+            var url = baseUrl + '/api/get.php';
+            xmlhttp.open("POST", url, true);
+            xmlhttp.setRequestHeader("Content-type", "application/json");
+            // When the state change then execute a function
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    const res = JSON.parse(xmlhttp.responseText).values // Turn the response into an object
+                    const usedTable = <?php print("\"$getTable\""); ?>;
+                    var cols = [{
+                        data: 'buttons',
+                        title: '<button class="btn btn-success"><i class="fas fa-plus-circle"></i></button>'
+                    }]
+                    var colDefs = [{
+                        'targets': 0,
+                        'orderable': false,
+                        'data': 'ID',
+                        'defaultContent': '<button class="btn btn-danger"><i class="far fa-trash-alt"></i></button><button class="btn btn-primary"><i class="fas fa-pen"></i></button>'
+                    }]
+                    $.each(Object.getOwnPropertyNames(res[0]), function(i, val) { // For each property, create a column
+                        cols.push({
+                            'data': val,
+                            'title': val
+                        })
+                    })
+
+                    if (usedTable == 'air_stations') {
+                        cols.push({
+                            'data': 'mapButtons',
+                            'title': 'map'
+                        })
+
+                        colDefs.push({
+                            'targets': -1,
+                            'orderable': false,
+                            'data': 'mapButtons',
+                            "defaultContent": '<button class="btn btn-info"><i class="fas fa-map-marked"></i></button>'
+                        })
+
+                        var colReorder = {
+                            "fixedColumnsLeft": 1,
+                            "fixedColumnsRight": 1,
+                        }
+                    } else {
+                        var colReorder = {
+                            "fixedColumnsLeft": 1
+                        }
+                    }
+
+                    $('#' + tableId).DataTable({
+                        'order': [
+                            [1, 'asc']
+                        ],
+                        'columns': cols,
+                        'data': res,
+                        'columnDefs': colDefs,
+                        'colReorder': colReorder
+                    });
+                }
+            }
+            var parameters = {
+                "table": table
+            };
+            xmlhttp.send(JSON.stringify(parameters));
+        }
+
+        function deleteRow(baseUrl, table, column, value) {
+            var choose = confirm('Are you sure you want to delete the row with ' + column + ' ' + value + '?')
+            if (choose) {
+                var data = {
+                    'table': table,
+                    'column': column,
+                    'value': value
+                }
+
+                $.post(baseUrl + '/api/delete.php', data, function() {
+                    alert('Row deleted succesfully!');
+                })
+            }
+        }
+
         // When the document is ready, load DataTables and then show the table
         $(document).ready(function() {
-            $('#table').DataTable({
-                "columnDefs": [{
-                    "orderable": false,
-                    "targets": [0]
-                }],
-                colReorder: {
-                    fixedColumnsLeft: 1
-                }
-            });
+
+            <?php
+            include_once '../config.php';
+
+            print("getTable('$base_dir', '$getTable', 'table')");
+            ?>
+
             document.getElementById('table_container').style.display = 'block';
         });
-        $('#modal').on('show.bs.modal', function(event) {
-            var button = $(event.relatedTarget) // Button that triggered the modal
-            var lat = button.data('lat') // Extract info from data-* attributes.
-            var lng = button.data('lng')
-            document.getElementById('latCoord').text = lat // Saving the coords into hidden text fields, to get them
-            document.getElementById('lngCoord').text = lng // from the modal
-            var modal = $(this)
-            modal.find('.modal-title').text("Latitude: " + lat + ' - Longitude: ' + lng) // Set the modal title
-            loadMapScenario() // Load the map
-        })
-        $('#dataModal').on('show.bs.modal', function(event) {
-            var button = $(event.relatedTarget) // Button that triggered the modal
 
+        $('#table').on('click', 'button', function(e) {
+            <?php
+            print("var baseUrl = \"$base_dir\"; var usedTable = \"$getTable\";");
+            ?>
+            var table = $('#table').DataTable();
+            var data = table.row($(this).parents('tr')).data();
+            if ($(e.target).is('.btn-danger') || $(e.target).is('.fa-trash-alt')) {
+                // If the pressed button is the red one or the icon pressed is the trash can one
+                // then start the deleteRow function                                                     
+                deleteRow($baseUrl, usedTable, Object.keys(data)[0], data[Object.keys(data)[0]])
+            } else if ($(e.target).is('.btn-success') || $(e.target).is('.fa-plus-circle')) {
+                // If the pressed button is the green one or the pressed icon is the plus one
+                console.log('Success!')
+            } else if ($(e.target).is('.btn-primary') || $(e.target).is('.fa-pen')) {
+                // If the pressed button is the blue one or the pressed icon is the pen one
+                $('#dataModal').modal({
+                    show: true
+                })
+                console.log('Primary!')
+            } else if ($(e.target).is('.btn-info') || $(e.target).is('.fa-map-marked')) {
+                // If the pressed button is the light-blue one or the pressed icon is the map one
+                // then make the baseUrl variable with the content of the PHP $base_dir var
+                <?php
+                print("var baseUrl = \"$base_dir\";");
+                ?>
+                // Get the city from the row where the button was pressed
+                const city = table.row($(this).parents('tr')).data().city;
+
+                // Set xmlhttp to make the POST request
+                xmlhttp = new XMLHttpRequest();
+                var url = baseUrl + '/api/getCoords.php';
+                xmlhttp.open("POST", url, true);
+                xmlhttp.setRequestHeader("Content-type", "application/json");
+                // When the state changes then execute a function
+                xmlhttp.onreadystatechange = function() {
+                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                        const res = JSON.parse(xmlhttp.responseText)[0] // Turn the response into an object
+                        document.getElementById('latCoord').text = res.latitude // Set those two texts as the vars
+                        document.getElementById('lngCoord').text = res.longitude // so they can be read by the map
+
+                        // Show the modal and set its title
+                        var modal = $('#mapModal').modal({
+                            'show': true
+                        })
+                        modal.find('.modal-title').text("Latitude: " + res.latitude + ' - Longitude: ' + res.longitude) // Set the modal title
+                    }
+                }
+
+                // The parameters to be sent via post
+                var parameters = {
+                    "city": city
+                };
+                xmlhttp.send(JSON.stringify(parameters));
+            } else {
+                console.log(e.target)
+            }
+        })
+
+        $('#mapModal').on('show.bs.modal', function(event) {
+            loadMapScenario() // Load the map
         })
     </script>
 
     <!-- Footer -->
     <footer class="page-footer font-small bg-dark">
         <div class="container-fluid text-center">
-            <a href="https://github.com/Knocks83">Creato da Luca Fenu per la prova di maturità 2019/2020</a>
+            <a href="https://github.com/Knocks83">Website made by Luca Fenu for the graduation exam year 2019/2020</a>
         </div>
     </footer>
 

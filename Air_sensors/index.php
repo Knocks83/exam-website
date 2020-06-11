@@ -181,7 +181,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" data-target="#dataModal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="button" id="dataModalSubmit" class="btn btn-primary">Submit</button>
                 </div>
             </div>
         </div>
@@ -229,83 +229,65 @@
         }
 
         function getTable(baseUrl, table, tableId) {
-            // Set xmlhttp
-            xmlhttp = new XMLHttpRequest();
-            var url = baseUrl + '/api/get.php';
-            xmlhttp.open("POST", url, true);
-            xmlhttp.setRequestHeader("Content-type", "application/json");
-            // When the state change then execute a function
-            xmlhttp.onreadystatechange = function() {
-                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                    const res = JSON.parse(xmlhttp.responseText).values // Turn the response into an object
-                    const usedTable = <?php print("\"$getTable\""); ?>;
-                    var cols = [{
-                        data: 'buttons',
-                        title: '<button class="btn btn-success"><i class="fas fa-plus-circle"></i></button>'
-                    }]
-                    var colDefs = [{
-                        'targets': 0,
-                        'orderable': false,
-                        'data': 'ID',
-                        'defaultContent': '<button class="btn btn-danger"><i class="far fa-trash-alt"></i></button><button class="btn btn-primary"><i class="fas fa-pen"></i></button>'
-                    }]
-                    $.each(Object.getOwnPropertyNames(res[0]), function(i, val) { // For each property, create a column
-                        cols.push({
-                            'data': val,
-                            'title': val
-                        })
+            $.getJSON(baseUrl + '/api/get.php?table=' + table, function(res) {
+                const usedTable = <?php print("\"$getTable\""); ?>;
+                var cols = [{
+                    data: 'buttons',
+                    title: '<button class="btn btn-success"><i class="fas fa-plus-circle"></i></button>'
+                }]
+                var colDefs = [{
+                    'targets': 0,
+                    'orderable': false,
+                    'data': 'ID',
+                    'defaultContent': '<button class="btn btn-danger"><i class="far fa-trash-alt"></i></button><button class="btn btn-primary"><i class="fas fa-pen"></i></button>'
+                }]
+                $.each(Object.getOwnPropertyNames(res.values[0]), function(i, val) { // For each property, create a column
+                    cols.push({
+                        'data': val,
+                        'title': val
+                    })
+                })
+
+                if (usedTable == 'air_stations') {
+                    cols.push({
+                        'data': 'mapButtons',
+                        'title': 'map'
                     })
 
-                    if (usedTable == 'air_stations') {
-                        cols.push({
-                            'data': 'mapButtons',
-                            'title': 'map'
-                        })
+                    colDefs.push({
+                        'targets': -1,
+                        'orderable': false,
+                        'data': 'mapButtons',
+                        "defaultContent": '<button class="btn btn-info"><i class="fas fa-map-marked"></i></button>'
+                    })
 
-                        colDefs.push({
-                            'targets': -1,
-                            'orderable': false,
-                            'data': 'mapButtons',
-                            "defaultContent": '<button class="btn btn-info"><i class="fas fa-map-marked"></i></button>'
-                        })
-
-                        var colReorder = {
-                            "fixedColumnsLeft": 1,
-                            "fixedColumnsRight": 1,
-                        }
-                    } else {
-                        var colReorder = {
-                            "fixedColumnsLeft": 1
-                        }
+                    var colReorder = {
+                        "fixedColumnsLeft": 1,
+                        "fixedColumnsRight": 1,
                     }
-
-                    $('#' + tableId).DataTable({
-                        'order': [
-                            [1, 'asc']
-                        ],
-                        'columns': cols,
-                        'data': res,
-                        'columnDefs': colDefs,
-                        'colReorder': colReorder
-                    });
+                } else {
+                    var colReorder = {
+                        "fixedColumnsLeft": 1
+                    }
                 }
-            }
-            var parameters = {
-                "table": table
-            };
-            xmlhttp.send(JSON.stringify(parameters));
+
+                $('#' + tableId).DataTable({
+                    'order': [
+                        [1, 'asc']
+                    ],
+                    'columns': cols,
+                    'data': res.values,
+                    'columnDefs': colDefs,
+                    'colReorder': colReorder
+                });
+            })
         }
 
         function deleteRow(baseUrl, table, column, value) {
             var choose = confirm('Are you sure you want to delete the row with ' + column + ' ' + value + '?')
             if (choose) {
-                var data = {
-                    'table': table,
-                    'column': column,
-                    'value': value
-                }
-
-                $.post(baseUrl + '/api/delete.php', data, function() {
+                var link = baseUrl + '/api/get.php?table=' + table + '&column=' + column + '&value=' + value
+                $.getJSON(link, function(res) {
                     alert('Row deleted succesfully!');
                 })
             }
@@ -315,80 +297,53 @@
             <?php
             print("var baseUrl = \"$base_dir\"; var usedTable = \"$getTable\";");
             ?>
-            // Set xmlhttp
-            xmlhttp = new XMLHttpRequest();
-            var url = baseUrl + '/api/columns.php';
-            xmlhttp.open("POST", url, true);
-            xmlhttp.setRequestHeader("Content-type", "application/json");
-            // When the state change then execute a function
-            xmlhttp.onreadystatechange = function() {
-                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                    const res = JSON.parse(xmlhttp.responseText) // Turn the response into an object
-                    const cols = res.columns
+            $.getJSON(baseUrl + '/api/columns.php?table=' + usedTable, function(res) {
+                const cols = res.columns
 
-                    cols.forEach(function(element) {
-                        var colName = element.COLUMN_NAME;
+                cols.forEach(function(element) {
+                    var colName = element.COLUMN_NAME;
 
-                        $('#dataForm').append('<div class="form-group">')
-                        $('#dataForm').append('<label class="col-sm-4 col-form-label" style="color: black;">' + colName + '</label>')
+                    $('#dataForm').append('<div class="form-group">')
+                    $('#dataForm').append('<label class="col-sm-4 col-form-label" style="color: black;">' + colName + '</label>')
 
-                        if (element.DATA_TYPE == 'int' || element.DATA_TYPE == 'double') {
-                            $('#dataForm').append('<input type="number" name="' + colName + '" />');
+                    if (element.DATA_TYPE == 'int' || element.DATA_TYPE == 'double') {
+                        $('#dataForm').append('<input type="number" name="' + colName + '" />');
 
-                        } else {
-                            $('#dataForm').append('<input type="text" name="' + colName + '" />');
-                        }
-                        $('#dataForm').append('</div>')
-                    })
-                    $('#dataModal').modal({
-                        show: true
-                    })
-                }
-            }
-            var parameters = {
-                "table": usedTable
-            };
-            console.log(parameters)
-            xmlhttp.send(JSON.stringify(parameters));
+                    } else {
+                        $('#dataForm').append('<input type="text" name="' + colName + '" />');
+                    }
+                    $('#dataForm').append('</div>')
+                })
+                $('#dataModal').modal({
+                    show: true
+                })
+            })
         }
 
         function openEditModal(data) {
             <?php
             print("var baseUrl = \"$base_dir\"; var usedTable = \"$getTable\";");
             ?>
-            // Set xmlhttp
-            xmlhttp = new XMLHttpRequest();
-            var url = baseUrl + '/api/columns.php';
-            xmlhttp.open("POST", url, true);
-            xmlhttp.setRequestHeader("Content-type", "application/json");
-            // When the state change then execute a function
-            xmlhttp.onreadystatechange = function() {
-                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                    const res = JSON.parse(xmlhttp.responseText) // Turn the response into an object
-                    const cols = res.columns
+            $.getJSON(baseUrl + '/api/columns.php?table=' + usedTable, function(res) {
+                const cols = res.columns
 
-                    cols.forEach(function(element) {
-                        var colName = element.COLUMN_NAME;
-                        $('#dataForm').append('<div class="form-group">')
-                        $('#dataForm').append('<label class="col-sm-4 col-form-label" style="color: black;">' + colName + '</label>')
-                        if (element.DATA_TYPE == 'int' || element.DATA_TYPE == 'double') {
-                            
-                            $('#dataForm').append('<input type="number" name="' + colName + '" value="' + data[colName] + '"/>');
+                cols.forEach(function(element) {
+                    var colName = element.COLUMN_NAME;
+                    $('#dataForm').append('<div class="form-group">')
+                    $('#dataForm').append('<label class="col-sm-4 col-form-label" style="color: black;">' + colName + '</label>')
+                    if (element.DATA_TYPE == 'int' || element.DATA_TYPE == 'double') {
 
-                        } else {
-                            $('#dataForm').append('<input type="text" name="' + colName + '" value="' + data[colName] + '"/>');
-                        }
-                        $('#dataForm').append('</div>')
-                    })
-                    $('#dataModal').modal({
-                        show: true
-                    })
-                }
-            }
-            var parameters = {
-                "table": usedTable
-            };
-            xmlhttp.send(JSON.stringify(parameters));
+                        $('#dataForm').append('<input type="number" name="' + colName + '" value="' + data[colName] + '"/>');
+
+                    } else {
+                        $('#dataForm').append('<input type="text" name="' + colName + '" value="' + data[colName] + '"/>');
+                    }
+                    $('#dataForm').append('</div>')
+                })
+                $('#dataModal').modal({
+                    show: true
+                })
+            })
         }
 
         // When the document is ready, load DataTables and then show the table
@@ -416,12 +371,13 @@
 
             } else if ($(e.target).is('.btn-success') || $(e.target).is('.fa-plus-circle')) {
                 // If the pressed button is the green one or the pressed icon is the plus one
+                // open the data modal
                 openAddModal()
 
             } else if ($(e.target).is('.btn-primary') || $(e.target).is('.fa-pen')) {
                 // If the pressed button is the blue one or the pressed icon is the pen one
+                // open the data modal with the data of the row where the button was pressed
                 openEditModal(data)
-                console.log('Primary!')
 
             } else if ($(e.target).is('.btn-info') || $(e.target).is('.fa-map-marked')) {
                 // If the pressed button is the light-blue one or the pressed icon is the map one
@@ -432,34 +388,36 @@
                 // Get the city from the row where the button was pressed
                 const city = table.row($(this).parents('tr')).data().city;
 
-                // Set xmlhttp to make the POST request
-                xmlhttp = new XMLHttpRequest();
-                var url = baseUrl + '/api/getCoords.php';
-                xmlhttp.open("POST", url, true);
-                xmlhttp.setRequestHeader("Content-type", "application/json");
-                // When the state changes then execute a function
-                xmlhttp.onreadystatechange = function() {
-                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                        const res = JSON.parse(xmlhttp.responseText)[0] // Turn the response into an object
-                        document.getElementById('latCoord').text = res.latitude // Set those two texts as the vars
-                        document.getElementById('lngCoord').text = res.longitude // so they can be read by the map
+                $.getJSON(baseUrl + '/api/getCoords.php?city=' + city, function(res) {
+                    document.getElementById('latCoord').text = res[0].latitude // Set those two texts as the vars
+                    document.getElementById('lngCoord').text = res[0].longitude // so they can be read by the map
 
-                        // Show the modal and set its title
-                        var modal = $('#mapModal').modal({
-                            'show': true
-                        })
-                        modal.find('.modal-title').text("Latitude: " + res.latitude + ' - Longitude: ' + res.longitude) // Set the modal title
-                    }
-                }
-
-                // The parameters to be sent via post
-                var parameters = {
-                    "city": city
-                };
-                xmlhttp.send(JSON.stringify(parameters));
-            } else {
-                console.log(e.target)
+                    // Show the modal and set its title
+                    var modal = $('#mapModal').modal({
+                        'show': true
+                    })
+                    modal.find('.modal-title').text("Latitude: " + res[0].latitude + ' - Longitude: ' + res[0].longitude) // Set the modal title
+                })
             }
+        })
+
+        $('#dataModalSubmit').on('click', function() {
+            <?php
+            print("var baseUrl = \"$base_dir\"; var usedTable = \"$getTable\";");
+            ?>
+            // Get the form data and put them in an associative array
+            var inputs = $('#dataForm :input');
+            var values = {};
+            inputs.each(function() {
+                values[this.name] = $(this).val();
+            });
+
+            // Stringify the JSON and make a get request to the APIs
+            var encodedJson = JSON.stringify(values)
+            $.getJSON(baseUrl + '/api/addUpdate.php?table=' + usedTable + '&data=' + encodedJson, function(res) {
+                console.log(res)
+                alert('Success!')
+            })
         })
 
         $('#mapModal').on('show.bs.modal', function(event) {
@@ -468,6 +426,7 @@
 
         $('#dataModal').on('hidden.bs.modal', function() {
             document.getElementById('dataForm').innerHTML = ''
+            location.reload()
         })
     </script>
 

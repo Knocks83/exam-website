@@ -137,7 +137,12 @@ class Api
 
         unset($i, $keysStr, $valuesStr, $updateStr, $length);
 
-        return $this->conn->query($query);
+        try {
+            $this->conn->query($query);
+            return true;
+        } catch (\PDOException $e) {
+            return false;
+        }
     }
 
     /**

@@ -10,12 +10,12 @@ include_once './api.php';
 // Get the POST data and decode it
 $data = json_decode(file_get_contents("php://input"), true);
 
-// If it gets no raw data, check if they're sent via form
+// If it gets no raw data, check if they're sent via get
 if (empty($data)) {
-    if (isset($_POST['table']) && isset($_POST['column']) && isset($_POST['value'])) {
-        $data['table'] = $_POST['table'];
-        $data['column'] = $_POST['column'];
-        $data['values'] = $_POST['value'];
+    if (isset($_GET['table']) && isset($_GET['column']) && isset($_GET['value'])) {
+        $data['table'] = $_GET['table'];
+        $data['column'] = $_GET['column'];
+        $data['values'] = $_GET['value'];
     }
 }
 
@@ -31,10 +31,10 @@ if (!isset($data['table']) || !isset($data['column']) || !isset($data['value']))
 // Create DB connection and Api object
 $db_object = new Database();
 $db = $db_object->getConnection();
-$api = new Api($db, $_POST['table']);
+$api = new Api($db, $data['table']);
 
 // Fetch query and the number of rows
-$result = $api->delete($_POST['column'], $_POST['value']);
+$result = $api->delete($data['column'], $data['value']);
 
 if ($result > 0) {
     http_response_code(200);

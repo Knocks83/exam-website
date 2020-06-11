@@ -10,10 +10,10 @@ include_once './api.php';
 // Get the POST data and decode it
 $data = json_decode(file_get_contents("php://input"), true);
 
-// If it gets no raw data, check if they're sent via form
+// If it gets no raw data, check if they're sent via get
 if (empty($data)) {
-    if (isset($_POST['city'])) {
-        $data['city'] = $_POST['city'];
+    if (isset($_GET['city'])) {
+        $data['city'] = $_GET['city'];
     }
 }
 

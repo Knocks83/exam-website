@@ -132,7 +132,7 @@
                     <a class="nav-link" href="#">Air Sensors</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="../Componenti">What did I use?</a>
+                    <a class="nav-link" href="../Components">What did I use?</a>
                 </li>
             </ul>
         </div>

@@ -151,9 +151,13 @@
                     <div style="display: none;"><a id="latCoord"></a><a id="lngCoord"></a></div>
                 </div>
                 <div class="modal-body mx-auto">
-                    <!-- Map div + importing the Bing Maps JS (using the key "YourBingMapsKey" because it looks like it works) -->
-                    <div id='myMap' style='position: relative; width: 50vh; height: 50vh;'></div>
-                    <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?key=YourBingMapsKey' async defer></script>
+                    <!-- Map div + importing the Bing Maps JS -->
+                    <div id='map' style='position: relative; width: 40vw; height: 50vh;'></div>
+                    <?php
+                    include '../config.php';
+
+                    print("<script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?key=$bing_API_key' async defer></script>");
+                    ?>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" data-target="#mapModal">Close</button>
@@ -167,13 +171,13 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="dataModalTitle">Modal title</h5>
+                    <h5 class="modal-title" id="dataModalTitle">Add/Edit data</h5>
                     <button type="button" class="close" data-dismiss="modal" data-target="#dataModal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    ...
+                    <form id="dataForm" method="POST" action=""></form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" data-target="#dataModal">Close</button>
@@ -213,7 +217,7 @@
             var lat = document.getElementById('latCoord').text
             var lng = document.getElementById('lngCoord').text
 
-            var map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
+            var map = new Microsoft.Maps.Map(document.getElementById('map'), {
                 center: new Microsoft.Maps.Location(lat, lng)
             });
             var pushpin = new Microsoft.Maps.Pushpin(map.getCenter(), {
@@ -307,6 +311,86 @@
             }
         }
 
+        function openAddModal() {
+            <?php
+            print("var baseUrl = \"$base_dir\"; var usedTable = \"$getTable\";");
+            ?>
+            // Set xmlhttp
+            xmlhttp = new XMLHttpRequest();
+            var url = baseUrl + '/api/columns.php';
+            xmlhttp.open("POST", url, true);
+            xmlhttp.setRequestHeader("Content-type", "application/json");
+            // When the state change then execute a function
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    const res = JSON.parse(xmlhttp.responseText) // Turn the response into an object
+                    const cols = res.columns
+
+                    cols.forEach(function(element) {
+                        var colName = element.COLUMN_NAME;
+
+                        $('#dataForm').append('<div class="form-group">')
+                        $('#dataForm').append('<label class="col-sm-4 col-form-label" style="color: black;">' + colName + '</label>')
+
+                        if (element.DATA_TYPE == 'int' || element.DATA_TYPE == 'double') {
+                            $('#dataForm').append('<input type="number" name="' + colName + '" />');
+
+                        } else {
+                            $('#dataForm').append('<input type="text" name="' + colName + '" />');
+                        }
+                        $('#dataForm').append('</div>')
+                    })
+                    $('#dataModal').modal({
+                        show: true
+                    })
+                }
+            }
+            var parameters = {
+                "table": usedTable
+            };
+            console.log(parameters)
+            xmlhttp.send(JSON.stringify(parameters));
+        }
+
+        function openEditModal(data) {
+            <?php
+            print("var baseUrl = \"$base_dir\"; var usedTable = \"$getTable\";");
+            ?>
+            // Set xmlhttp
+            xmlhttp = new XMLHttpRequest();
+            var url = baseUrl + '/api/columns.php';
+            xmlhttp.open("POST", url, true);
+            xmlhttp.setRequestHeader("Content-type", "application/json");
+            // When the state change then execute a function
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    const res = JSON.parse(xmlhttp.responseText) // Turn the response into an object
+                    const cols = res.columns
+
+                    cols.forEach(function(element) {
+                        var colName = element.COLUMN_NAME;
+                        $('#dataForm').append('<div class="form-group">')
+                        $('#dataForm').append('<label class="col-sm-4 col-form-label" style="color: black;">' + colName + '</label>')
+                        if (element.DATA_TYPE == 'int' || element.DATA_TYPE == 'double') {
+                            
+                            $('#dataForm').append('<input type="number" name="' + colName + '" value="' + data[colName] + '"/>');
+
+                        } else {
+                            $('#dataForm').append('<input type="text" name="' + colName + '" value="' + data[colName] + '"/>');
+                        }
+                        $('#dataForm').append('</div>')
+                    })
+                    $('#dataModal').modal({
+                        show: true
+                    })
+                }
+            }
+            var parameters = {
+                "table": usedTable
+            };
+            xmlhttp.send(JSON.stringify(parameters));
+        }
+
         // When the document is ready, load DataTables and then show the table
         $(document).ready(function() {
 
@@ -329,15 +413,16 @@
                 // If the pressed button is the red one or the icon pressed is the trash can one
                 // then start the deleteRow function                                                     
                 deleteRow($baseUrl, usedTable, Object.keys(data)[0], data[Object.keys(data)[0]])
+
             } else if ($(e.target).is('.btn-success') || $(e.target).is('.fa-plus-circle')) {
                 // If the pressed button is the green one or the pressed icon is the plus one
-                console.log('Success!')
+                openAddModal()
+
             } else if ($(e.target).is('.btn-primary') || $(e.target).is('.fa-pen')) {
                 // If the pressed button is the blue one or the pressed icon is the pen one
-                $('#dataModal').modal({
-                    show: true
-                })
+                openEditModal(data)
                 console.log('Primary!')
+
             } else if ($(e.target).is('.btn-info') || $(e.target).is('.fa-map-marked')) {
                 // If the pressed button is the light-blue one or the pressed icon is the map one
                 // then make the baseUrl variable with the content of the PHP $base_dir var
@@ -379,6 +464,10 @@
 
         $('#mapModal').on('show.bs.modal', function(event) {
             loadMapScenario() // Load the map
+        })
+
+        $('#dataModal').on('hidden.bs.modal', function() {
+            document.getElementById('dataForm').innerHTML = ''
         })
     </script>
 

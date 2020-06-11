@@ -4,8 +4,8 @@ header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 
 // Include the used libraries
-include_once '../database.php';
-include_once '../api.php';
+include_once './database.php';
+include_once './api.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 

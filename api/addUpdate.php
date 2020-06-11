@@ -7,7 +7,10 @@ header("Content-Type: application/json; charset=UTF-8");
 include_once './database.php';
 include_once './api.php';
 
-if (!isset($_POST['table']) || !isset($_POST['column']) || !isset($_POST['value'])) {
+// Get the POST data and decode it
+$data = json_decode(file_get_contents("php://input"), true);
+
+if (!isset($data['table']) || !isset($data['values'])) {
     http_response_code(400);
     echo json_encode(
         array('error' => 'Missing parameters')
@@ -18,17 +21,17 @@ if (!isset($_POST['table']) || !isset($_POST['column']) || !isset($_POST['value'
 // Create DB connection and Api object
 $db_object = new Database();
 $db = $db_object->getConnection();
-$api = new Api($db, $_POST['table']);
+$api = new Api($db, $data['table']);
 
 // Fetch query and the number of rows
-$result = $api->delete($_POST['column'], $_POST['value']);
+$result = $api->addUpdate($data['values']);
 
-if ($result > 0) {
+if ($result) {
     http_response_code(200);
     echo json_encode(
         array(
-            'count' => $result,
-            'result' => 'success')
+            'result' => 'success'
+        )
     );
 } else {
     http_response_code(404);

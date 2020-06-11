@@ -4,8 +4,8 @@ class Api
     // DB Connection
     private $conn;
 
-    private $table_name;
-    public $cols = [];
+    private $table_name;    // The name of the table the instance is using
+    public $cols = [];      // The list of columns with their type
 
     /**
      * Class constructor
@@ -15,7 +15,7 @@ class Api
      */
     public function __construct($db, $table_name)
     {
-        include 'config.php';
+        include '../config.php';
 
         $this->conn = $db;
         if ($table_name == NULL)
@@ -33,7 +33,7 @@ class Api
      */
     function changeTable($table_name)
     {
-        include 'config.php';
+        include '../config.php';
 
         if ($table_name == NULL)
             $this->table_name = $default_table;
@@ -41,14 +41,12 @@ class Api
             $this->table_name = $table_name;
 
         $this->cols = [];
-        $stmt = $this->conn->query('SELECT COLUMN_NAME
+        $stmt = $this->conn->query('SELECT COLUMN_NAME, DATA_TYPE
         FROM INFORMATION_SCHEMA.COLUMNS
         WHERE TABLE_SCHEMA="' . $db_name . '" AND TABLE_NAME="' . $this->table_name . '"');
 
         $stmt->execute();
-        foreach ($stmt->fetchAll() as $col) {
-            array_push($this->cols, $col['COLUMN_NAME']);
-        }
+        $this->cols = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
@@ -99,6 +97,47 @@ class Api
         WHERE air_cities.city = "' . $city . '"');
 
         return $stmt;
+    }
+
+    /**
+     * Delete a row
+     * 
+     * @param values An associative array containing column_name => values 
+     * 
+     * @return rowCount The number of edited rows
+     */
+    function addUpdate($values)
+    {
+        $query = 'INSERT INTO ' . $this->table_name;
+        if (empty($values))
+            return;
+
+        $i = 0;
+        $length = count($values);
+
+        $keysStr = '(';
+        $valuesStr = '(';
+        $updateStr = '';
+
+        foreach ($values as $key => $value) {
+            $keyVal = htmlspecialchars(strip_tags($key));
+            $valVal = htmlspecialchars(strip_tags($value));
+            if ($i < $length - 1) {
+                $keysStr .= $keyVal.',';
+                $valuesStr .= '"'.$valVal.'",';
+                $updateStr .= $keyVal.' = "' . $valVal . '", ';
+            } else {
+                $keysStr .= $keyVal.')';
+                $valuesStr .= '"'.$valVal.'")';
+                $updateStr .= $keyVal.' = "' . $valVal . '"';
+            }
+            $i++;
+        }
+        $query .= " $keysStr VALUES $valuesStr ON DUPLICATE KEY UPDATE $updateStr";
+
+        unset($i, $keysStr, $valuesStr, $updateStr, $length);
+        
+        return $this->conn->query($query);
     }
 
     /**

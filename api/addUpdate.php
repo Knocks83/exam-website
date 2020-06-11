@@ -10,6 +10,15 @@ include_once './api.php';
 // Get the POST data and decode it
 $data = json_decode(file_get_contents("php://input"), true);
 
+// If it gets no raw data, check if they're sent via form
+if (empty($data)) {
+    if (isset($_POST['table']) && isset($_POST['values'])) {
+        $data['table'] = $_POST['table'];
+        $data['values'] = $_POST['values'];
+    }
+}
+
+// If the table value or the values value is not found, return an error and stop the execution
 if (!isset($data['table']) || !isset($data['values'])) {
     http_response_code(400);
     echo json_encode(

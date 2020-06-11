@@ -123,20 +123,20 @@ class Api
             $keyVal = htmlspecialchars(strip_tags($key));
             $valVal = htmlspecialchars(strip_tags($value));
             if ($i < $length - 1) {
-                $keysStr .= $keyVal.',';
-                $valuesStr .= '"'.$valVal.'",';
-                $updateStr .= $keyVal.' = "' . $valVal . '", ';
+                $keysStr .= $keyVal . ',';
+                $valuesStr .= '"' . $valVal . '",';
+                $updateStr .= $keyVal . ' = "' . $valVal . '", ';
             } else {
-                $keysStr .= $keyVal.')';
-                $valuesStr .= '"'.$valVal.'")';
-                $updateStr .= $keyVal.' = "' . $valVal . '"';
+                $keysStr .= $keyVal . ')';
+                $valuesStr .= '"' . $valVal . '")';
+                $updateStr .= $keyVal . ' = "' . $valVal . '"';
             }
             $i++;
         }
         $query .= " $keysStr VALUES $valuesStr ON DUPLICATE KEY UPDATE $updateStr";
 
         unset($i, $keysStr, $valuesStr, $updateStr, $length);
-        
+
         return $this->conn->query($query);
     }
 

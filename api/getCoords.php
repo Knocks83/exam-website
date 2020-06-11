@@ -7,9 +7,17 @@ header("Content-Type: application/json; charset=UTF-8");
 include_once './database.php';
 include_once './api.php';
 
+// Get the POST data and decode it
 $data = json_decode(file_get_contents("php://input"), true);
 
-// If the table value is not found, return an error and stop the execution
+// If it gets no raw data, check if they're sent via form
+if (empty($data)) {
+    if (isset($_POST['city'])) {
+        $data['city'] = $_POST['city'];
+    }
+}
+
+// If the city value is not found, return an error and stop the execution
 if (!isset($data['city'])) {
     http_response_code(400);
     echo json_encode(

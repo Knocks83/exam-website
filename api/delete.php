@@ -7,7 +7,20 @@ header("Content-Type: application/json; charset=UTF-8");
 include_once './database.php';
 include_once './api.php';
 
-if (!isset($_POST['table']) || !isset($_POST['column']) || !isset($_POST['value'])) {
+// Get the POST data and decode it
+$data = json_decode(file_get_contents("php://input"), true);
+
+// If it gets no raw data, check if they're sent via form
+if (empty($data)) {
+    if (isset($_POST['table']) && isset($_POST['column']) && isset($_POST['value'])) {
+        $data['table'] = $_POST['table'];
+        $data['column'] = $_POST['column'];
+        $data['values'] = $_POST['value'];
+    }
+}
+
+// If the required values are not found, return an error and stop the execution
+if (!isset($data['table']) || !isset($data['column']) || !isset($data['value'])) {
     http_response_code(400);
     echo json_encode(
         array('error' => 'Missing parameters')
@@ -28,7 +41,8 @@ if ($result > 0) {
     echo json_encode(
         array(
             'count' => $result,
-            'result' => 'success')
+            'result' => 'success'
+        )
     );
 } else {
     http_response_code(404);

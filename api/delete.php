@@ -15,7 +15,7 @@ if (empty($data)) {
     if (isset($_GET['table']) && isset($_GET['column']) && isset($_GET['value'])) {
         $data['table'] = $_GET['table'];
         $data['column'] = $_GET['column'];
-        $data['values'] = $_GET['value'];
+        $data['value'] = $_GET['value'];
     }
 }
 
@@ -36,7 +36,7 @@ $api = new Api($db, $data['table']);
 // Fetch query and the number of rows
 $result = $api->delete($data['column'], $data['value']);
 
-if ($result > 0) {
+if ($result >= 0) {
     http_response_code(200);
     echo json_encode(
         array(
@@ -47,6 +47,6 @@ if ($result > 0) {
 } else {
     http_response_code(404);
     echo json_encode(
-        array('error' => 'Value not found')
+        array('error' => 'Error while deleting data!')
     );
 }

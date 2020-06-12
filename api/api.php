@@ -164,10 +164,11 @@ class Api
         // Bind the variable and execute the query
         $stmt->bindParam('value', $value);
 
-        if ($stmt->execute()) {
+        try {
+            $stmt->execute();
             return $stmt->rowCount();
+        } catch (PDOException $e) {
+            return -1;
         }
-
-        return 0;
     }
 }

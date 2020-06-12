@@ -292,7 +292,7 @@
         function deleteRow(baseUrl, table, column, value) {
             var choose = confirm('Are you sure you want to delete the row with ' + column + ' ' + value + '?')
             if (choose) {
-                var link = baseUrl + '/api/get.php?table=' + table + '&column=' + column + '&value=' + value
+                var link = baseUrl + '/api/delete.php?table=' + table + '&column=' + column + '&value=' + value
                 $.getJSON(link, function(res) {
                     alert('Row deleted succesfully!');
                 })
@@ -373,7 +373,8 @@
             if ($(e.target).is('.btn-danger') || $(e.target).is('.fa-trash-alt')) {
                 // If the pressed button is the red one or the icon pressed is the trash can one
                 // then start the deleteRow function                                                     
-                deleteRow($baseUrl, usedTable, Object.keys(data)[0], data[Object.keys(data)[0]])
+                deleteRow(baseUrl, usedTable, Object.keys(data)[0], data[Object.keys(data)[0]])
+                console.log(usedTable)
 
             } else if ($(e.target).is('.btn-success') || $(e.target).is('.fa-plus-circle')) {
                 // If the pressed button is the green one or the pressed icon is the plus one

@@ -104,6 +104,12 @@
         #table-select a {
             color: white;
         }
+
+        @media (max-width: 900px) {
+            .fix {
+                height: 30px;
+            }
+        }
     </style>
 </head>
 
@@ -430,6 +436,7 @@
         })
     </script>
 
+    <div class="fix"></div>
     <!-- Footer -->
     <footer class="page-footer font-small bg-dark">
         <div class="container-fluid text-center">

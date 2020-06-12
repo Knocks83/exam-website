@@ -37,9 +37,19 @@ footer {
     height: 45px;
 }
 
+@media (min-width: 900px) {
+    .fix {
+        display: none;
+    }
+}
+
 @media (max-width: 900px) {
     .navbar-text {
         padding-left: 15px;
+    }
+
+    .page-footer {
+        height: 60px !important;
     }
 
     .page-footer a {

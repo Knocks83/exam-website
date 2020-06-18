@@ -49,7 +49,7 @@ function updateAirDB(PDO $PDO)
         NomeTipoSensore VARCHAR(30),
         UnitaMisura VARCHAR(30),
         IdStazione VARCHAR(30),
-        NomeStazione VARCHAR(30),
+        NomeStazione VARCHAR(50),
         Quota VARCHAR(30),
         Provincia VARCHAR(30),
         Comune VARCHAR(30),
@@ -84,26 +84,26 @@ function updateAirDB(PDO $PDO)
     }
     unset($addStmt, $stations);
 
-    $citiesStmt = $PDO->prepare("INSERT INTO air_cities(city, province, latitude, longitude)
+    $citiesStmt = $PDO->prepare("INSERT IGNORE INTO air_cities(city, province, latitude, longitude)
         SELECT DISTINCT comune, provincia, lat, lng FROM $tempTableName
         GROUP BY comune, provincia");
     $citiesStmt->execute();
 
-    $sensorTypesStmt = $PDO->prepare("INSERT INTO air_sensortypes(type_name, unit_of_measure)
+    $sensorTypesStmt = $PDO->prepare("INSERT IGNORE INTO air_sensortypes(type_name, unit_of_measure)
         SELECT DISTINCT NomeTipoSensore, UnitaMisura FROM $tempTableName");
     $sensorTypesStmt->execute();
 
-    $airStationsStmt = $PDO->prepare("INSERT INTO air_stations (ID, name, city, height)
+    $airStationsStmt = $PDO->prepare("INSERT IGNORE INTO air_stations (ID, name, city, height)
         SELECT DISTINCT IdStazione, NomeStazione, Comune, Quota FROM $tempTableName");
     $airStationsStmt->execute();
 
-    $airSensorsStmt = $PDO->prepare("INSERT INTO air_sensors (ID, type, station_ID, data_start, data_end)
+    $airSensorsStmt = $PDO->prepare("INSERT IGNORE INTO air_sensors (ID, type, station_ID, data_start, data_end)
         SELECT DISTINCT IdSensore, NomeTipoSensore, IdStazione, DataStart, DataStop FROM $tempTableName");
     $airSensorsStmt->execute();
 
     $PDO->exec("DROP TABLE $tempTableName");
 
-    $measurementsStmt = $PDO->prepare("INSERT INTO air_measurements (sensor_ID, date, value, status) VALUES (:sensorid, :date, :value, :status)");
+    $measurementsStmt = $PDO->prepare("INSERT IGNORE INTO air_measurements (sensor_ID, date, value, status) VALUES (:sensorid, :date, :value, :status)");
     foreach ($data as $measurement) {
         $measurementsStmt->execute(['sensorid' => $measurement->idsensore, 'date' => $measurement->data, 'value' => $measurement->valore, 'status' => $measurement->stato]);
     }

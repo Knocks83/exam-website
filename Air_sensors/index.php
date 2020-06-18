@@ -254,7 +254,9 @@
                     })
                 })
 
+
                 if (usedTable == 'air_stations') {
+                    // Add the map button
                     cols.push({
                         'data': 'mapButtons',
                         'title': 'map'
@@ -267,16 +269,19 @@
                         "defaultContent": '<button class="btn btn-info"><i class="fas fa-map-marked"></i></button>'
                     })
 
+                    // Make the map column and the edit column static
                     var colReorder = {
                         "fixedColumnsLeft": 1,
                         "fixedColumnsRight": 1,
                     }
                 } else {
+                    // make the edit column static
                     var colReorder = {
                         "fixedColumnsLeft": 1
                     }
                 }
 
+                //  Create the DataTable
                 $('#' + tableId).DataTable({
                     'order': [
                         [1, 'asc']
@@ -295,6 +300,7 @@
                 var link = baseUrl + '/api/delete.php?table=' + table + '&column=' + column + '&value=' + value
                 $.getJSON(link, function(res) {
                     alert('Row deleted succesfully!');
+                    location.reload()
                 })
             }
         }
@@ -422,7 +428,6 @@
             // Stringify the JSON and make a get request to the APIs
             var encodedJson = JSON.stringify(values)
             $.getJSON(baseUrl + '/api/addUpdate.php?table=' + usedTable + '&data=' + encodedJson, function(res) {
-                console.log(res)
                 alert('Success!')
             })
         })
